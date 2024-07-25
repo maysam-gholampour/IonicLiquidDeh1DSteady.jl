@@ -1,5 +1,7 @@
 module IonicLiquidDeh1DSteady
+    using CoolProp
+    include("FluidProperties/Props.jl")
 
-# Write your package code here.
+
 
 end
