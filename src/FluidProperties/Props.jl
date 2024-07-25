@@ -4,4 +4,6 @@ struct CreCOPlus5100 <: IonicLiquid end
 
 
 include("Air.jl")
+include("Water.jl")
+
 
