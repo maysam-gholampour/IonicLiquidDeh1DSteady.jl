@@ -1,3 +1,18 @@
+using IonicLiquidDeh1DSteady
+
+
+const N_fin_evap = 48
+const N_fin_cond = 75
+const FD = 0.205
+const g = 9.81
+const δₛₒₗ = ∛(3 * ṁₛₒₗ * νₛₒₗ / (ρₛₒₗ * g * FD))
+const H = 0.132
+const FS = 0.00254
+const Reₛₒₗ = Uₛₒₗ_ᵣ * δₛₒₗ / νₛₒₗ
+
+
+
+
 begin "test evaporator 1 "
     T_air_amb = 21.21 + 273.15  # K
     T_wb_air_amb = 25.48 + 273.15  # K
@@ -11,9 +26,16 @@ begin "test evaporator 1 "
     T_sat_evap = 10.51 + 273.15  # K
     Q_evap = 1192  # W
     # ========================================
+    ṁₐ = (m_dot_air_deh / N_fin_evap) * 0.5 # mass flow rate for half of the fin space
+    ṁₛₒₗ = (m_dot_sol_deh / N_fin_evap) * 0.5 # mass flow rate for half of the fin space
+
+
+    # ========================================
     # T_air_out_deh = 19.57 + 273.15 # K
     # RH_out_deh = 49.61 # % 
     # ========================================
+
+
 end
 
 begin "test evaporator 2 "
