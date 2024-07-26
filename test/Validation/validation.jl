@@ -12,8 +12,8 @@ const FS = 0.00254
 
 begin "validate evaporator 1 "
     IL = CreCOPlus5100()
-    T_air_amb = 21.21 + 273.15  # K
-    T_wb_air_amb = 25.48 + 273.15  # K
+    T_air_amb = 25.48 + 273.15  # K
+    T_wb_air_amb = 21.21 + 273.15  # K
     m_dot_air_deh = 0.03584  # kg/s
     m_dot_sol_deh = 2.57 / 60 / 1000  # kg/s
     T_sol_in_deh = 21 + 273.15  # K
@@ -60,8 +60,8 @@ begin "validate evaporator 1 "
 end
 
 begin "test evaporator 2 "
-    T_air_amb = 21.2 + 273.15   # K
-    T_wb_air_amb = 25.65 + 273.15  # K
+    T_air_amb = 25.65 + 273.15  # K
+    T_wb_air_amb = 21.2 + 273.15   # K
     m_dot_air_deh = 0.03415  # kg/s
     m_dot_sol_deh = 2.53 / 60 / 1000  # kg/s
     T_sol_in_deh = 19 + 273.15  # K
@@ -78,8 +78,8 @@ begin "test evaporator 2 "
 end
 
 begin "test condenser 1 "
-    T_air_amb = 21.21 + 273.15  # K
-    T_wb_air_amb = 25.48 + 273.15  # K
+    T_air_amb = 25.48 + 273.15  # K
+    T_wb_air_amb  = 21.21 + 273.15  # K
     m_dot_air_reg = 0.04725  # kg/s
     m_dot_sol_reg = 2.63 / 60 / 1000  # kg/s
     T_sol_in_reg = 31 + 273.15  # K
@@ -97,8 +97,8 @@ begin "test condenser 1 "
 end
 
 begin "test condenser 2 "
-    T_air_amb = 21.2 + 273.15   # K
-    T_wb_air_amb = 25.65 + 273.15  # K
+    T_air_amb = 25.65 + 273.15  # K
+    T_wb_air_amb = 21.2 + 273.15   # K
     m_dot_air_reg = 0.04731  # kg/s
     m_dot_sol_reg = 2.67 / 60 / 1000  # kg/s
     T_sol_in_reg = 32 + 273.15  # K
