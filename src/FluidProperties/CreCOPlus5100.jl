@@ -68,13 +68,16 @@ begin "Properties Interpolations and Extrapolations"
     end
     # ================== Find T given i_sol and ξ ====================
     # Function to find the root, given i_sol and ξ
-    function calculate_T_sol(iᵛₛₒₗ::T1, ξ::T1,::CreCOPlus5100 ;T_lower=0.0 + 273.15, T_upper=95.0 + 273.15) where {T1}
-        f(T::T1, p::Array{T1})= _iₛₒₗ(T, p[2],CreCOPlus5100()) - p[1]
-        p = [iᵛₛₒₗ,ξ]
-        T_span = [T_lower , T_upper]
+    function calculate_T_sol(iᵛₛₒₗ, ξ,::CreCOPlus5100 ;T_lower=0.0 + 273.15, T_upper=95.0 + 273.15) 
+        f(T, p)= _iₛₒₗ(T, p[2],CreCOPlus5100()) - p[1]
+        p = @SVector[iᵛₛₒₗ,ξ]
+        T_span = @SVector[T_lower , T_upper]
         prob = IntervalNonlinearProblem(f, T_span, p)
         result = solve(prob, ITP())
-        return result.u::Float64
+        return calculate_T_barrier(result)
+    end
+    function calculate_T_barrier(result)
+        return result.u
     end
 end
 
