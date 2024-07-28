@@ -6,6 +6,6 @@ module IonicLiquidDeh1DSteady
     using BoundaryValueDiffEq
 
     include("FluidProperties/Props.jl")
-    include("solver.jl")
+    include("SolverX/solver.jl")
 
 end
