@@ -1,21 +1,30 @@
 using IonicLiquidDeh1DSteady
 using CoolProp
 
+
+
 begin "constants"
+    const δ_fin_evap = 0.00013
+    const D_tube_outside_evap = 0.0101
+    N_tube_per_row_evap = 6
+    const N_row_evap = 6
+    const N_tube_evap = N_tube_per_row_evap * N_row_evap
     const N_fin_evap = 48
     const N_fin_cond = 75
-    const FD = 0.205
+    const FD_evap = 0.155
     const g = 9.81
-    const H = 0.132
-    const FS = 0.00254
+    const H_origin_evap = 0.132
+    const FS_evap = 0.00254
     const Le = 0.85
-    NTUᴰₐᵢᵣ = 1.0
+    const H_evap = (H_origin_evap * FD_evap - N_tube_per_row_evap * π * 0.25 * D_tube_outside_evap^2) / FD_evap #NOTE: H_evap is the adjusted height
+    @show H_evap
     const σ = 1.0
 end
 
+
 begin "validate evaporator 1"
     IL = CreCOPlus5100()
-    T_air_amb = 25.48 + 273.15  # K
+    T_air_amb = 25.48 + 273.15 + 1.5 # K  #NOTE: 1.5 is the Blower temperature rise
     T_wb_air_amb = 21.21 + 273.15  # K
     m_dot_air_deh = 0.03584  # kg/s
     m_dot_sol_deh = 1100 * 2.57 / 60 / 1000  # kg/s  #FIXME: 1100 is density
@@ -25,7 +34,7 @@ begin "validate evaporator 1"
     T_ref_out_evap = 17.04 + 273.15  # K
     P_evap = 4.3 * 100000  # Pa
     T_sat_evap = 10.51 + 273.15  # K
-    Q_evap = 862  # W
+    Q_evap = 1192  # W #NOTE: 862 is the cooling capacity based on the air only
     # ========================================
     ṁₐ = (m_dot_air_deh / N_fin_evap) * 0.5 # mass flow rate for half of the fin space
     ṁₛₒₗ = (m_dot_sol_deh / N_fin_evap) * 0.5 # mass flow rate for half of the fin space
@@ -34,9 +43,9 @@ begin "validate evaporator 1"
     ρₛₒₗ = _ρₛₒₗ(Tₛₒₗ_ᵢₙ,ξₛₒₗ_ᵢₙ,IL)
     μₛₒₗ = _μₛₒₗ(Tₛₒₗ_ᵢₙ,ξₛₒₗ_ᵢₙ,IL)
     νₛₒₗ = μₛₒₗ / ρₛₒₗ
-    δₛₒₗ = ∛(3 * ṁₛₒₗ * νₛₒₗ / (ρₛₒₗ * g * FD))
-    Uₛₒₗ_ᵣ = ṁₛₒₗ / (ρₛₒₗ * δₛₒₗ * FD)
-    ARₛₒₗ = δₛₒₗ / H
+    δₛₒₗ = ∛(3 * ṁₛₒₗ * νₛₒₗ / (ρₛₒₗ * g * FD_evap))
+    Uₛₒₗ_ᵣ = ṁₛₒₗ / (ρₛₒₗ * δₛₒₗ * FD_evap)
+    ARₛₒₗ = δₛₒₗ / H_evap
     Reₛₒₗ = Uₛₒₗ_ᵣ * δₛₒₗ / νₛₒₗ
     𝑘ₛₒₗ = _𝑘ₛₒₗ(Tₛₒₗ_ᵢₙ,ξₛₒₗ_ᵢₙ,IL)
     cpₛₒₗ = _cpₛₒₗ(Tₛₒₗ_ᵢₙ,ξₛₒₗ_ᵢₙ,IL)
@@ -51,31 +60,35 @@ begin "validate evaporator 1"
     αₐ = _αₐ(Tₐ_ᵢₙ, ωₐ_ᵢₙ)
     cpₐ = _cpₐ(Tₐ_ᵢₙ, ωₐ_ᵢₙ)
     Prₐ = νₐ / αₐ
-    δₐ = 0.5 * FS - δₛₒₗ
-    Uₐ_ᵣ = ṁₐ / (ρₐ * δₐ * FD)
+    δₐ = 0.5 * FS_evap - δₛₒₗ
+    Uₐ_ᵣ = ṁₐ / (ρₐ * δₐ * FD_evap)
     Reₐ = Uₐ_ᵣ * δₐ / νₐ
-    ARₐ = δₐ / H
+    ARₐ = δₐ / H_evap
     uᵢₙₜ = 0.5g * δₛₒₗ^2 / νₛₒₗ
-    dpdx = -(3.0 * μₐ * uᵢₙₜ / (δₐ^2)) - (3.0 * μₐ * ṁₐ / (ρₐ * (δₐ ^ 3) * FD))
+    dpdx = -(3.0 * μₐ * uᵢₙₜ / (δₐ^2)) - (3.0 * μₐ * ṁₐ / (ρₐ * (δₐ ^ 3) * FD_evap))
     # ========================================
     # T_air_out_deh = 19.57 + 273.15 # K
     # RH_out_deh = 49.61 # % 
     # ========================================
     ∂Qᵣ = (Q_evap / N_fin_evap) * 0.5
     ṁₐᵢᵣ_ᵢₙ = ṁₐ
+    A_c = (FS_evap - δₛₒₗ) * FD_evap - N_tube_per_row_evap * (FS_evap - δₛₒₗ) * D_tube_outside_evap
+    @show uₘₐₓ = ṁₐ / (ρₐ * A_c)
+    # uₘₐₓ = ṁₐ / (ρₐ * FD_evap * (FS_evap - δₛₒₗ))
     ṁₛₒₗ_ᵢₙ = ṁₛₒₗ
     iₛₒₗ_ᵢₙ = _iₛₒₗ(Tₛₒₗ_ᵢₙ,ξₛₒₗ_ᵢₙ,IL)
     iₐ_ᵢₙ = HAPropsSI("H", "T", Tₐ_ᵢₙ, "P", 101325.0 , "Twb", T_wb_air_amb)
-    # res = solve_coil_ode(IL ,H ,Le ,∂Qᵣ ,ṁₐᵢᵣ_ᵢₙ ,NTUᴰₐᵢᵣ ,σ ,ṁₛₒₗ_ᵢₙ ,ξₛₒₗ_ᵢₙ ,iₛₒₗ_ᵢₙ , ωₐ_ᵢₙ, iₐ_ᵢₙ)
-    @show h_d = NTUᴰₐᵢᵣ * ṁₐ / (FD * H)
-    @show h_c = h_d * cpₐ * Le^(2.0/3.0)
-
+    # res = solve_coil_ode(IL ,H_evap ,Le ,∂Qᵣ ,ṁₐᵢᵣ_ᵢₙ ,NTUᴰₐᵢᵣ ,σ ,ṁₛₒₗ_ᵢₙ ,ξₛₒₗ_ᵢₙ ,iₛₒₗ_ᵢₙ , ωₐ_ᵢₙ, iₐ_ᵢₙ)
+    # @show h_d = NTUᴰₐᵢᵣ * ṁₐ / (FD_evap * H_evap)
+    # @show h_c = h_d * cpₐ * Le^(2.0/3.0)
+    @show NTUᴰₐᵢᵣ = NTU(ρₐ, uₘₐₓ, D_tube_outside_evap, μₐ, Prₐ, FS_evap,
+            FD_evap, δₛₒₗ, H_evap, N_tube_evap, N_row_evap, 𝑘ₐ, cpₐ, Le, ṁₐ,δ_fin_evap)  
 end
 
 @show ṁₛₒₗ / ṁₐᵢᵣ_ᵢₙ 
 @show MR = ṁₛₒₗ_ᵢₙ / ṁₐᵢᵣ_ᵢₙ
 @show ER = iₛₒₗ_ᵢₙ / iₐ_ᵢₙ
-sol = solve_coil_ode(IL ,H ,Le ,∂Qᵣ ,ṁₐᵢᵣ_ᵢₙ ,NTUᴰₐᵢᵣ ,σ ,ṁₛₒₗ_ᵢₙ ,ξₛₒₗ_ᵢₙ ,iₛₒₗ_ᵢₙ , ωₐ_ᵢₙ, iₐ_ᵢₙ)
+sol = solve_coil_ode(IL ,H_evap ,Le ,∂Qᵣ ,ṁₐᵢᵣ_ᵢₙ ,NTUᴰₐᵢᵣ ,σ ,ṁₛₒₗ_ᵢₙ ,ξₛₒₗ_ᵢₙ ,iₛₒₗ_ᵢₙ , ωₐ_ᵢₙ, iₐ_ᵢₙ)
 
 size(sol.u[1])
 x1 = zeros(length(sol.u))
@@ -107,6 +120,13 @@ plot(sol.t, x2, label = "iᵢᵣ")
 plot(sol.t, x3, label = "ṁₛₒₗ")
 plot(sol.t, x4, label = "ξₛₒₗ")
 plot(sol.t, x5, label = "iₛₒₗ")
+
+x3[end] * x5[end]  - x3[1] * x5[1]
+
+4 * 0.75 * 0.3 * 7 * 5 * 4.44
+
+(0.005 / 0.2 + 1 / 5) ^ -1
+
 T_sol_calc = (i,ξ) -> calculate_T_sol(i, ξ,IL) - 273.15
 T_sol = @. T_sol_calc(x5, x4)
 plot(sol.t, T_sol, label = "Tₛₒₗ")

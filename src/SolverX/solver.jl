@@ -1,5 +1,6 @@
 export solve_coil_ode
 
+include("NTU.jl")
 
 function ionic_liquid_coil_ode!(du,u, p, t)
     # ωₐᵢᵣ, iₐᵢᵣ, ṁₛₒₗ,ξₛₒₗ, iₛₒₗ = u
