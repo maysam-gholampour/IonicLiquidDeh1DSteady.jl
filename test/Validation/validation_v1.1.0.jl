@@ -22,7 +22,10 @@ begin "constants"
 end
 
 
+
 begin "validate evaporator 1"
+
+
     IL = CreCOPlus5100()
     T_air_amb = 25.48 + 273.15 + 1.5 # K  #NOTE: 1.5 is the Blower temperature rise
     T_wb_air_amb = 21.21 + 273.15  # K
@@ -84,6 +87,8 @@ begin "validate evaporator 1"
     @show NTUᴰₐᵢᵣ = NTU(ρₐ, uₘₐₓ, D_tube_outside_evap, μₐ, Prₐ, FS_evap,
             FD_evap, δₛₒₗ, H_evap, N_tube_evap, N_row_evap, 𝑘ₐ, cpₐ, Le, ṁₐ,δ_fin_evap)  
 end
+
+
 
 @show ṁₛₒₗ / ṁₐᵢᵣ_ᵢₙ 
 @show MR = ṁₛₒₗ_ᵢₙ / ṁₐᵢᵣ_ᵢₙ
