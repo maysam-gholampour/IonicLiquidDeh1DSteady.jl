@@ -1,9 +1,9 @@
 export NTU
 
-function NTU(ρ, uₘₐₓ, D_tube, μ, Pr, fin_spacing,
-    fin_depth, δₛₒₗ, H, N_tube, N_row, k, cp, Le, ṁₐ,δ_fin)  
-   A_fin = 2 * (H * fin_depth - N_tube * π * D_tube^2 / 4)
-   A_tube = N_tube * π * D_tube * (fin_spacing - 2 * δₛₒₗ)
+function NTU(ρ::T1, uₘₐₓ::T1, D_tube::T1, μ::T1, Pr::T1, fin_spacing::T1,
+    fin_depth::T1, δₛₒₗ::T1, H::T1, N_tube::T2, N_row::T2, k::T1, cp::T1, Le::T1, ṁₐ::T1,δ_fin::T1)   where {T1<:AbstractFloat,T2<:Integer}
+   A_fin = 2.0 * (H * fin_depth - N_tube * π * D_tube^2.0 / 4.0)
+   A_tube = N_tube * π * D_tube * (fin_spacing - 2.0 * δₛₒₗ)
    Aₒ = A_fin + A_tube
    # https://doi.org/10.1115/1.2826030
    Re_D = ρ * uₘₐₓ * D_tube / μ
@@ -11,7 +11,7 @@ function NTU(ρ, uₘₐₓ, D_tube, μ, Pr, fin_spacing,
    j = 0.394 * Re_D^(-0.392) * ((δ_fin + δₛₒₗ) / D_tube)^(-0.0449) * N_row^(-0.0897) * (Fₚ / D_tube)^(-0.212)  
    f = 1.039 * Re_D^(-0.418) * ((δ_fin + δₛₒₗ) / D_tube)^(-0.104) * N_row^(-0.0935) * (Fₚ / D_tube)^(-0.197)  
 
-   Nu = j * Re_D * Pr^(1/3)
+   Nu = j * Re_D * Pr^(1.0/3.0)
    hₒ = Nu * k / D_tube
    hᴰₐᵢᵣ = hₒ / cp * Le^(2.0/3.0)
    NTUᴰₐᵢᵣ = hᴰₐᵢᵣ * fin_depth * H / ṁₐ
