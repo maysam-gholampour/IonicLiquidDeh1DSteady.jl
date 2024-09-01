@@ -11,10 +11,8 @@ begin
     FD_evap = 0.155
     H_evap = 0.132
     FS_evap = 0.00254
-    Le = 0.85
+    Le = 0.86
     σ_evap = 1.0
-
-
     # ========================================
     IL = CreCOPlus5100()
     T_air_amb = 25.48 + 273.15 + 1.5 # K  #NOTE: 1.5 is the Blower temperature rise
@@ -28,7 +26,6 @@ begin
     Q_evap = 1192.0
     P_evap = 4.3e5
     T_sat_evap = 10.51 + 273.15
-
 end
 
 plateFinCircularTube = PlateFinCircularTube(δ_fin_evap, D_tube_outside_evap, N_tube_per_row_evap, N_row_evap,
@@ -69,7 +66,7 @@ ṁₛₒₗ = zeros(len_vec);
 ξₛₒₗ = zeros(len_vec);
 iₛₒₗ = zeros(len_vec);
 
-simulate!(plateFinCircularTube,fluidThermalData, dt,tspan,ωₐᵢᵣ,iₐᵢᵣ,ṁₛₒₗ,ξₛₒₗ,iₛₒₗ)
+@time simulate!(plateFinCircularTube,fluidThermalData, dt,tspan,ωₐᵢᵣ,iₐᵢᵣ,ṁₛₒₗ,ξₛₒₗ,iₛₒₗ)
 
 using InteractiveUtils:@code_warntype
 
