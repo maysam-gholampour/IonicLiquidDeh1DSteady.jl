@@ -4,6 +4,7 @@ module IonicLiquidDeh1DSteady
     using Interpolations
     using NonlinearSolve
     using BoundaryValueDiffEq
+    using SciMLBase
 
     include("FluidProperties/Props.jl")
     include("SolverX/solver.jl")

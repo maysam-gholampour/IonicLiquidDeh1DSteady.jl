@@ -1,4 +1,4 @@
-export solve_coil_ode
+export solve_coil_ode!
 
 include("NTU.jl")
 
@@ -21,14 +21,11 @@ function ionic_liquid_coil_ode!(du,u, p, t)
     ER = iₛₒₗ_ᵢₙ / iₐ_ᵢₙ
     # ========================================
     Tₛₒₗ = calculate_T_sol(u[5] * iₛₒₗ_ᵢₙ, u[4] * ξₛₒₗ_ᵢₙ, IL)
-    # @info "Tₛₒₗ = $(Tₛₒₗ - 273.15)"
     Pᵥₐₚₒᵣ_ₛₒₗ = _Pᵥₐₚₒᵣ_ₛₒₗ(Tₛₒₗ,u[4] * ξₛₒₗ_ᵢₙ,IL)
-    # @info "Pᵥₐₚₒᵣ_ₛₒₗ = $(Pᵥₐₚₒᵣ_ₛₒₗ)"
     ωₑ = 0.622 * Pᵥₐₚₒᵣ_ₛₒₗ / (101325.0 - Pᵥₐₚₒᵣ_ₛₒₗ) / ωₐ_ᵢₙ
     iₑ = (1.01 * (Tₛₒₗ - 273.15) + ωₑ * ωₐ_ᵢₙ * (2500 + 1.04 * (Tₛₒₗ - 273.15))) / iₐ_ᵢₙ
     iₑ *= 1000
     iᵥₐₚₒᵣ_ₜₛ = iᵥ_ₛₐₜ(Tₛₒₗ) / iₐ_ᵢₙ 
-    # @info "iᵥₐₚₒᵣ_ₜₛ = $(iᵥₐₚₒᵣ_ₜₛ)"
 
     du[1] = σ * NTUᴰₐᵢᵣ * (u[1] - ωₑ)
     du[2] = σ * NTUᴰₐᵢᵣ * Le * ((u[2] - iₑ) + (ωₐ_ᵢₙ * iᵥₐₚₒᵣ_ₜₛ * (1 / Le - 1) * (u[1] - ωₑ)))
@@ -51,23 +48,36 @@ function bcb!(res_b, u_b, p)
     nothing
 end
 
-function solve_coil_ode(IL ,H ,Le ,∂Qᵣ ,ṁₐᵢᵣ_ᵢₙ ,NTUᴰₐᵢᵣ ,σ ,ṁₛₒₗ_ᵢₙ ,ξₛₒₗ_ᵢₙ ,iₛₒₗ_ᵢₙ , ωₐ_ᵢₙ, iₐ_ᵢₙ)
+function solve_coil_ode!(IL ,H ,Le ,∂Qᵣ ,ṁₐᵢᵣ_ᵢₙ ,NTUᴰₐᵢᵣ ,σ ,ṁₛₒₗ_ᵢₙ ,ξₛₒₗ_ᵢₙ ,iₛₒₗ_ᵢₙ , ωₐ_ᵢₙ, iₐ_ᵢₙ,
+                        dt,tspan,ωₐᵢᵣ,iₐᵢᵣ,ṁₛₒₗ,ξₛₒₗ,iₛₒₗ)
     p = @SVector[IL, H, Le, ∂Qᵣ, ṁₐᵢᵣ_ᵢₙ, NTUᴰₐᵢᵣ, σ, ṁₛₒₗ_ᵢₙ, ξₛₒₗ_ᵢₙ, iₛₒₗ_ᵢₙ, ωₐ_ᵢₙ, iₐ_ᵢₙ]
-    u0 = [0.7, 0.7 , 1.0001 , 0.9 , 1.01 ]
+    u0 = [0.7, 0.7 , 1.0001 , 0.9 , 1.01]
+
+    # TwoPointBVProblem(ionic_liquid_coil_ode!, (bca!, bcb!),
+    #     u0, tspan; bcresid_prototype, nlls = Val(false))
+    
     bvp_fun = BVPFunction(
-                ionic_liquid_coil_ode!, (bca!, bcb!),
+                ionic_liquid_coil_ode!, (bca!, bcb!);
                 bcresid_prototype = (zeros(3), zeros(2)), twopoint = Val(true)
                 )
-    tspan = (0.0, 1.0)
-    prob = BVProblem(bvp_fun,
+    
+    prob = TwoPointBVProblem(bvp_fun,
         u0,
         tspan,
         p)
-    sol = solve(prob, MIRK4(), dt = 0.001)
-    sol
+    
+    sol = solve(prob, MIRK4(), dt = dt)
+
+    @inbounds for i in 1:length(sol.u)
+        # ωₐᵢᵣ, iₐᵢᵣ, ṁₛₒₗ,ξₛₒₗ, iₛₒₗ = u
+        ωₐᵢᵣ[i] = sol.u[i][1] * ωₐ_ᵢₙ
+        iₐᵢᵣ[i] = sol.u[i][2] * iₐ_ᵢₙ
+        ṁₛₒₗ[i] = sol.u[i][3] * ṁₛₒₗ_ᵢₙ
+        ξₛₒₗ[i] = sol.u[i][4] * ξₛₒₗ_ᵢₙ
+        iₛₒₗ[i] = sol.u[i][5] * iₛₒₗ_ᵢₙ
+    end
+    nothing
 end
-
-
 
 
 

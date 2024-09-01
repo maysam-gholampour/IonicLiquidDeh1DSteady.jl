@@ -88,64 +88,74 @@ end
 @show ṁₛₒₗ / ṁₐᵢᵣ_ᵢₙ 
 @show MR = ṁₛₒₗ_ᵢₙ / ṁₐᵢᵣ_ᵢₙ
 @show ER = iₛₒₗ_ᵢₙ / iₐ_ᵢₙ
-sol = solve_coil_ode(IL ,H_evap ,Le ,∂Qᵣ ,ṁₐᵢᵣ_ᵢₙ ,NTUᴰₐᵢᵣ ,σ ,ṁₛₒₗ_ᵢₙ ,ξₛₒₗ_ᵢₙ ,iₛₒₗ_ᵢₙ , ωₐ_ᵢₙ, iₐ_ᵢₙ)
 
-size(sol.u[1])
-x1 = zeros(length(sol.u))
-x2 = zeros(length(sol.u))
-x3 = zeros(length(sol.u))
-x4 = zeros(length(sol.u))
-x5 = zeros(length(sol.u))
-for i in 1:length(sol.u)
-    # ωₐᵢᵣ, iₐᵢᵣ, ṁₛₒₗ,ξₛₒₗ, iₛₒₗ = u
-    x1[i] = sol.u[i][1] * ωₐ_ᵢₙ
-    x2[i] = sol.u[i][2] * iₐ_ᵢₙ
-    x3[i] = sol.u[i][3] * ṁₛₒₗ_ᵢₙ
-    x4[i] = sol.u[i][4] * ξₛₒₗ_ᵢₙ
-    x5[i] = sol.u[i][5] * iₛₒₗ_ᵢₙ
-end
+using InteractiveUtils:@code_warntype
+
+dt = 0.001
+tspan = (0.0, 1.0)
+t = tspan[1]:dt:tspan[2]
+len_vec = length(tspan[1]:dt:tspan[2])
+
+ωₐᵢᵣ = zeros(len_vec);
+iₐᵢᵣ = zeros(len_vec);
+ṁₛₒₗ = zeros(len_vec);
+ξₛₒₗ = zeros(len_vec);
+iₛₒₗ = zeros(len_vec);
+
+
+
+
+@code_warntype solve_coil_ode!(IL ,H_evap ,Le ,∂Qᵣ ,ṁₐᵢᵣ_ᵢₙ ,NTUᴰₐᵢᵣ ,σ ,ṁₛₒₗ_ᵢₙ ,ξₛₒₗ_ᵢₙ ,iₛₒₗ_ᵢₙ , ωₐ_ᵢₙ, iₐ_ᵢₙ,
+                dt,tspan,ωₐᵢᵣ,iₐᵢᵣ,ṁₛₒₗ,ξₛₒₗ,iₛₒₗ)
+
+ sol   = solve_coil_ode!(IL ,H_evap ,Le ,∂Qᵣ ,ṁₐᵢᵣ_ᵢₙ ,NTUᴰₐᵢᵣ ,σ ,ṁₛₒₗ_ᵢₙ ,ξₛₒₗ_ᵢₙ ,iₛₒₗ_ᵢₙ , ωₐ_ᵢₙ, iₐ_ᵢₙ,
+                dt,tspan,ωₐᵢᵣ,iₐᵢᵣ,ṁₛₒₗ,ξₛₒₗ,iₛₒₗ)
+
+
+
+
 
 using Plots
-x1 = reverse(x1)
-x2 = reverse(x2)
+ωₐᵢᵣ = reverse(ωₐᵢᵣ)
+iₐᵢᵣ = reverse(iₐᵢᵣ)
 
 T_air_out_deh = 19.57 + 273.15 # K
 RH_out_deh = 0.01 * 49.61 # % 
 @show ωₐ_out = HAPropsSI("W", "T", T_air_out_deh, "P", 101325.0 , "R", RH_out_deh)
-x1[end]
+ωₐᵢᵣ[end]
 @show iₐ_out = HAPropsSI("H", "T", T_air_out_deh, "P", 101325.0 , "W", ωₐ_out)
-x2[end]
-plot(sol.t, x1, label = "ωᵢᵣ")
-plot(sol.t, x2, label = "iᵢᵣ")
-plot(sol.t, x3, label = "ṁₛₒₗ")
-plot(sol.t, x4, label = "ξₛₒₗ")
-plot(sol.t, x5, label = "iₛₒₗ")
+iₐᵢᵣ[end]
+plot(t, ωₐᵢᵣ, label = "ωᵢᵣ")
+plot(t, iₐᵢᵣ, label = "iᵢᵣ")
+plot(t, ṁₛₒₗ, label = "ṁₛₒₗ")
+plot(t, ξₛₒₗ, label = "ξₛₒₗ")
+plot(t, iₛₒₗ, label = "iₛₒₗ")
 
-x3[end] * x5[end]  - x3[1] * x5[1]
+ṁₛₒₗ[end] * iₛₒₗ[end]  - ṁₛₒₗ[1] * iₛₒₗ[1]
 
 4 * 0.75 * 0.3 * 7 * 5 * 4.44
 
 (0.005 / 0.2 + 1 / 5) ^ -1
 
 T_sol_calc = (i,ξ) -> calculate_T_sol(i, ξ,IL) - 273.15
-T_sol = @. T_sol_calc(x5, x4)
-plot(sol.t, T_sol, label = "Tₛₒₗ")
+T_sol = @. T_sol_calc(iₛₒₗ, ξₛₒₗ)
+plot(t, T_sol, label = "Tₛₒₗ")
 
 calculate_T_air = (ω,i) -> HAPropsSI("T", "W", ω , "H", i, "P", 101325.0)
-T_air  = @. calculate_T_air(x1,x2) - 273.15
-plot(sol.t, T_air, label = "Tᵢᵣ")
+T_air  = @. calculate_T_air(ωₐᵢᵣ,iₐᵢᵣ) - 273.15
+plot(t, T_air, label = "Tᵢᵣ")
 
 calculate_T_dp = (ω,i) -> HAPropsSI("Tdp", "W", ω , "H", i, "P", 101325.0)
-T_dp  = @. calculate_T_dp(x1,x2) - 273.15
-plot(sol.t, T_dp, label = "Tdp")
+T_dp  = @. calculate_T_dp(ωₐᵢᵣ,iₐᵢᵣ) - 273.15
+plot(t, T_dp, label = "Tdp")
 
 calculate_T_wet = (ω,i) -> HAPropsSI("Twb", "W", ω , "H", i, "P", 101325.0)
-T_wet  = @. calculate_T_wet(x1,x2) - 273.15
-plot(sol.t, T_wet, label = "Twb")
+T_wet  = @. calculate_T_wet(ωₐᵢᵣ,iₐᵢᵣ) - 273.15
+plot(t, T_wet, label = "Twb")
 
 calculate_RH = (ω,i) -> HAPropsSI("R", "W", ω , "H", i, "P", 101325.0)
-RH  = @. calculate_RH(x1,x2)
-plot(sol.t, RH, label = "RH")
+RH  = @. calculate_RH(ωₐᵢᵣ,iₐᵢᵣ)
+plot(t, RH, label = "RH")
 
 i_a_in = HAPropsSI("H", "T", T_air_amb, "P", 101325.0 , "Twb", T_wb_air_amb)
 i_a_out = HAPropsSI("H", "T", T_air_out_deh, "P", 101325.0 , "R", RH_out_deh)
