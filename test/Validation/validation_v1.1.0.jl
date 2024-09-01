@@ -34,27 +34,8 @@ plateFinCircularTube = PlateFinCircularTube(δ_fin_evap, D_tube_outside_evap, N_
 fluidThermalData = FluidThermalData(T_air_amb, T_wb_air_amb, m_dot_air_deh, m_dot_sol_deh, T_sol_in_deh, X_sol_in_deh, T_ref_in_evap,
                  T_ref_out_evap, IL, Q_evap, P_evap, T_sat_evap,Le)
 
-dt = 0.001
+dt = 0.01
 tspan = (0.0, 1.0)
-
-
-# begin "constants"
-#     const δ_fin_evap = 0.00013
-#     const D_tube_outside_evap = 0.0101
-#     N_tube_per_row_evap = 6
-#     const N_row_evap = 6
-#     const N_tube_evap = N_tube_per_row_evap * N_row_evap
-#     const N_fin_evap = 48
-#     const N_fin_cond = 75
-#     const FD_evap = 0.155
-    
-#     const H_origin_evap = 0.132
-#     const FS_evap = 0.00254
-#     const Le = 0.85
-#     const H_evap = (H_origin_evap * FD_evap - N_tube_per_row_evap * π * 0.25 * D_tube_outside_evap^2) / FD_evap #NOTE: H_evap is the adjusted height
-#     @show H_evap
-#     const σ = 1.0
-# end
 
 t = tspan[1]:dt:tspan[2]
 len_vec = length(tspan[1]:dt:tspan[2])
