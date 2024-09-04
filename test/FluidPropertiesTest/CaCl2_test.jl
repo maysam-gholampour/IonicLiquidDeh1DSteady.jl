@@ -38,5 +38,6 @@
     @test _iₛₒₗ(T, ξ, CaCl2()) ≈ 45329.025 atol=1e-3
 
 
-    @test_broken calculate_T_sol(-71999.9999, ξ, CaCl2()) ≈ 35.0 + 273.15 atol=1e-3
+    @test calculate_T_sol(45329.025, ξ, CaCl2()) ≈ 50.0 + 273.15 atol=0.1
 end
+

@@ -38,5 +38,5 @@
     @test _iₛₒₗ(T, ξ, LiCl()) ≈ 116705.086 atol=1e-3
 
 
-    @test_broken calculate_T_sol(-71999.9999, ξ, LiCl()) ≈ 35.0 + 273.15 atol=1e-3
+    @test calculate_T_sol(116705.086, ξ, LiCl()) ≈ 50.0 + 273.15 atol=1e-3
 end
