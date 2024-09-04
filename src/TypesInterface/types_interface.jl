@@ -1,10 +1,12 @@
-export IonicLiquid, CreCOPlus5100
+export IonicLiquid, CreCOPlus5100, LiCl, CaCl2
 export Coil, PlateFinCircularTube
 export InputData, FluidThermalData
 
 # ==================== IonicLiquid ====================
 abstract type IonicLiquid end
 struct CreCOPlus5100 <: IonicLiquid end
+struct LiCl <: IonicLiquid end
+struct CaCl2<:IonicLiquid end
 # ==================== Coil ====================
 abstract type Coil end
 struct PlateFinCircularTube{T1<:AbstractFloat, T2<:Integer} <: Coil 

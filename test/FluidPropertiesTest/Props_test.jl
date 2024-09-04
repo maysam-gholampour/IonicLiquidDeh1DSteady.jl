@@ -1,3 +1,5 @@
 include("Air_test.jl")
 include("Water_test.jl")
 include("CreCOPlus5100_test.jl")
+include("LiCl_test.jl")
+include("CaCl2_test.jl")

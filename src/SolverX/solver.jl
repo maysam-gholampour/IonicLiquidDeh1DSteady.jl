@@ -51,10 +51,7 @@ end
 function solve_coil_ode!(IL ,H ,Le ,∂Qᵣ ,ṁₐᵢᵣ_ᵢₙ ,NTUᴰₐᵢᵣ ,σ ,ṁₛₒₗ_ᵢₙ ,ξₛₒₗ_ᵢₙ ,iₛₒₗ_ᵢₙ , ωₐ_ᵢₙ, iₐ_ᵢₙ,
                         dt,tspan,ωₐᵢᵣ,iₐᵢᵣ,ṁₛₒₗ,ξₛₒₗ,iₛₒₗ)
     p = @SVector[IL, H, Le, ∂Qᵣ, ṁₐᵢᵣ_ᵢₙ, NTUᴰₐᵢᵣ, σ, ṁₛₒₗ_ᵢₙ, ξₛₒₗ_ᵢₙ, iₛₒₗ_ᵢₙ, ωₐ_ᵢₙ, iₐ_ᵢₙ]
-    u0 = [0.7, 0.7 , 1.0001 , 0.9 , 1.01]
-
-    # TwoPointBVProblem(ionic_liquid_coil_ode!, (bca!, bcb!),
-    #     u0, tspan; bcresid_prototype, nlls = Val(false))
+    u0 = [0.1, 0.1 , 1.0001 , 0.9 , 1.01]
     
     bvp_fun = BVPFunction(
                 ionic_liquid_coil_ode!, (bca!, bcb!);
@@ -66,7 +63,7 @@ function solve_coil_ode!(IL ,H ,Le ,∂Qᵣ ,ṁₐᵢᵣ_ᵢₙ ,NTUᴰₐᵢ�
         tspan,
         p)
     
-    sol = solve(prob, MIRK4(), dt = dt)
+    sol = solve(prob, MIRK4(defect_threshold = 0.05, max_num_subintervals = 30000), dt = dt)
 
     @inbounds for i in 1:length(sol.u)
         # ωₐᵢᵣ, iₐᵢᵣ, ṁₛₒₗ,ξₛₒₗ, iₛₒₗ = u
