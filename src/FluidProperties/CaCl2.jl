@@ -120,8 +120,6 @@ function _σₛₒₗ(T, ξ,::CaCl2)
     σₛₒₗ
 end
 
-# ================== Find T given i_sol and ξ ====================
-# Function to find the root, given i_sol and ξ
 function calculate_T_sol(iᵛₛₒₗ, ξ,::CaCl2 ;T_lower=0.0 + 273.15, T_upper=95.0 + 273.15) 
     f(T, p)= _iₛₒₗ(T, p[2],CaCl2()) - p[1]
     p = @SVector[iᵛₛₒₗ,ξ]
