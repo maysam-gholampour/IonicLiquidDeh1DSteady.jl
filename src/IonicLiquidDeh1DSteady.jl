@@ -13,8 +13,6 @@ module IonicLiquidDeh1DSteady
     include("Simulation/simulation.jl")
 
     @setup_workload begin
-        
-
         @compile_workload begin
             include("Simulation/_precompilation.jl")
         end

@@ -1,4 +1,5 @@
-export solve_coil_ode!, solve_coil_naive_ode
+export solve_coil_ode!, solve_coil_ode
+export solve_coil_naive_ode
 
 include("NTU.jl")
 
@@ -77,6 +78,41 @@ function solve_coil_ode!(IL ,H ,Le ,∂Qᵣ ,ṁₐᵢᵣ_ᵢₙ ,NTUᴰₐᵢ�
     nothing
 end
 
+function solve_coil_ode(IL ,H ,Le ,∂Qᵣ ,ṁₐᵢᵣ_ᵢₙ ,NTUᴰₐᵢᵣ ,σ ,ṁₛₒₗ_ᵢₙ ,ξₛₒₗ_ᵢₙ ,iₛₒₗ_ᵢₙ , ωₐ_ᵢₙ, iₐ_ᵢₙ,
+                dt,tspan)
+    p = @SVector[IL, H, Le, ∂Qᵣ, ṁₐᵢᵣ_ᵢₙ, NTUᴰₐᵢᵣ, σ, ṁₛₒₗ_ᵢₙ, ξₛₒₗ_ᵢₙ, iₛₒₗ_ᵢₙ, ωₐ_ᵢₙ, iₐ_ᵢₙ]
+    u0 = [0.5, 0.5 , 1.0001 , 0.9 , 1.01]
+
+    bvp_fun = BVPFunction(
+    ionic_liquid_coil_ode!, (bca!, bcb!);
+    bcresid_prototype = (zeros(3), zeros(2)), twopoint = Val(true)
+    )
+
+    prob = TwoPointBVProblem(bvp_fun,
+    u0,
+    tspan,
+    p)
+
+    sol = solve(prob, MIRK4(), dt = dt)
+    # sol = solve(prob, Shooting(Tsit5()))
+
+    len_vec = length(sol.u)
+    ωₐᵢᵣ = zeros(len_vec)
+    iₐᵢᵣ = zeros(len_vec)
+    ṁₛₒₗ = zeros(len_vec)
+    ξₛₒₗ = zeros(len_vec)
+    iₛₒₗ = zeros(len_vec)
+
+    @inbounds for i in 1:length(sol.u)
+        # ωₐᵢᵣ, iₐᵢᵣ, ṁₛₒₗ,ξₛₒₗ, iₛₒₗ = u
+        ωₐᵢᵣ[i] = sol.u[i][1] * ωₐ_ᵢₙ
+        iₐᵢᵣ[i] = sol.u[i][2] * iₐ_ᵢₙ
+        ṁₛₒₗ[i] = sol.u[i][3] * ṁₛₒₗ_ᵢₙ
+        ξₛₒₗ[i] = sol.u[i][4] * ξₛₒₗ_ᵢₙ
+        iₛₒₗ[i] = sol.u[i][5] * iₛₒₗ_ᵢₙ
+    end
+    ωₐᵢᵣ,iₐᵢᵣ,ṁₛₒₗ,ξₛₒₗ,iₛₒₗ
+end
 # ========================================
 
 function ionic_liquid_coil_naive_ode!(du,u, p, t)
