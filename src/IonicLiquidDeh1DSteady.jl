@@ -12,13 +12,13 @@ module IonicLiquidDeh1DSteady
     include("SolverX/solver.jl")
     include("Simulation/simulation.jl")
 
-    # @setup_workload begin
+    @setup_workload begin
         
 
-    #     @compile_workload begin
-    #         include("Simulation/_precompilation.jl")
-    #     end
-    # end
+        @compile_workload begin
+            include("Simulation/_precompilation.jl")
+        end
+    end
 
 
 end

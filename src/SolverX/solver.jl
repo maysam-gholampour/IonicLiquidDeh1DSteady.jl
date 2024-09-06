@@ -1,4 +1,4 @@
-export solve_coil_ode!
+export solve_coil_ode!, solve_coil_naive_ode
 
 include("NTU.jl")
 
@@ -63,8 +63,9 @@ function solve_coil_ode!(IL ,H ,Le ,∂Qᵣ ,ṁₐᵢᵣ_ᵢₙ ,NTUᴰₐᵢ�
         tspan,
         p)
     
-    sol = solve(prob, MIRK4(defect_threshold = 0.05, max_num_subintervals = 30000), dt = dt)
-
+    sol = solve(prob, MIRK4(), dt = dt)
+    # sol = solve(prob, Shooting(Tsit5()))
+        
     @inbounds for i in 1:length(sol.u)
         # ωₐᵢᵣ, iₐᵢᵣ, ṁₛₒₗ,ξₛₒₗ, iₛₒₗ = u
         ωₐᵢᵣ[i] = sol.u[i][1] * ωₐ_ᵢₙ
@@ -76,5 +77,76 @@ function solve_coil_ode!(IL ,H ,Le ,∂Qᵣ ,ṁₐᵢᵣ_ᵢₙ ,NTUᴰₐᵢ�
     nothing
 end
 
+# ========================================
 
+function ionic_liquid_coil_naive_ode!(du,u, p, t)
+    # ωₐᵢᵣ, iₐᵢᵣ, ṁₛₒₗ,ξₛₒₗ, iₛₒₗ = u
+    # ========================================
+    IL = p[1]
+    H = p[2]
+    Le = p[3]
+    ∂Qᵣ = p[4]
+    ṁₐᵢᵣ = p[5]
+    NTUᴰₐᵢᵣ = p[6]
+    σ = p[7]
+    ṁₛₒₗ_ᵢₙ =  p[8]
+    ξₛₒₗ_ᵢₙ = p[9]
+    iₛₒₗ_ᵢₙ = p[10]
+    ωₐ_ᵢₙ = p[11]
+    iₐ_ᵢₙ = p[12]
+    MR = ṁₛₒₗ_ᵢₙ / ṁₐᵢᵣ
+    ER = iₛₒₗ_ᵢₙ / iₐ_ᵢₙ
+    # ========================================
+    Tₛₒₗ = calculate_T_sol(u[3] * iₛₒₗ_ᵢₙ, ξₛₒₗ_ᵢₙ, IL)
+    Pᵥₐₚₒᵣ_ₛₒₗ = _Pᵥₐₚₒᵣ_ₛₒₗ(Tₛₒₗ, ξₛₒₗ_ᵢₙ,IL)
+    ωₑ = 0.622 * Pᵥₐₚₒᵣ_ₛₒₗ / (101325.0 - Pᵥₐₚₒᵣ_ₛₒₗ) / ωₐ_ᵢₙ
+    iₑ = (1.01 * (Tₛₒₗ - 273.15) + ωₑ * ωₐ_ᵢₙ * (2500 + 1.04 * (Tₛₒₗ - 273.15))) / iₐ_ᵢₙ
+    iₑ *= 1000
+    iᵥₐₚₒᵣ_ₜₛ = iᵥ_ₛₐₜ(Tₛₒₗ) / iₐ_ᵢₙ 
 
+    du[1] = σ * NTUᴰₐᵢᵣ * (u[1] - ωₑ)
+    du[2] = σ * NTUᴰₐᵢᵣ * Le * ((u[2] - iₑ) + (ωₐ_ᵢₙ * iᵥₐₚₒᵣ_ₜₛ * (1 / Le - 1) * (u[1] - ωₑ)))
+    du[3] = (1 / ṁₛₒₗ_ᵢₙ) * (σ * (1.0 / (MR * ER)) * du[2] - ∂Qᵣ / (ṁₛₒₗ_ᵢₙ * iₛₒₗ_ᵢₙ))
+    nothing
+end
+
+function bca_naive!(res_a, u_a, p)
+    res_a[1] = u_a[3] - 1.0
+    nothing
+end
+
+function bcb_naive!(res_b, u_b, p)
+    res_b[1] = u_b[1] - 1.0
+    res_b[2] = u_b[2] - 1.0
+    nothing
+end
+
+function solve_coil_naive_ode(IL ,H ,Le ,∂Qᵣ ,ṁₐᵢᵣ_ᵢₙ ,NTUᴰₐᵢᵣ ,σ ,ṁₛₒₗ_ᵢₙ ,ξₛₒₗ_ᵢₙ ,iₛₒₗ_ᵢₙ , ωₐ_ᵢₙ, iₐ_ᵢₙ,
+        dt,tspan)
+    p = @SVector[IL, H, Le, ∂Qᵣ, ṁₐᵢᵣ_ᵢₙ, NTUᴰₐᵢᵣ, σ, ṁₛₒₗ_ᵢₙ, ξₛₒₗ_ᵢₙ, iₛₒₗ_ᵢₙ, ωₐ_ᵢₙ, iₐ_ᵢₙ]
+    u0 = [0.1, 0.1  , 1.01]
+
+    bvp_fun = BVPFunction(
+        ionic_liquid_coil_naive_ode!, (bca_naive!, bcb_naive!);
+        bcresid_prototype = (zeros(1), zeros(2)), twopoint = Val(true)
+    )
+
+    prob = TwoPointBVProblem(bvp_fun,
+        u0,
+        tspan,
+        p)
+
+    sol = solve(prob, MIRK4(defect_threshold = 0.1, max_num_subintervals = 30000), dt = dt)
+
+    len_vec = length(sol.u)
+    ωₐᵢᵣ = zeros(len_vec)
+    iₐᵢᵣ = zeros(len_vec)
+    iₛₒₗ = zeros(len_vec)
+    @inbounds for i in 1:length(sol.u)
+        # ωₐᵢᵣ, iₐᵢᵣ, iₛₒₗ = u
+        ωₐᵢᵣ[i] = sol.u[i][1] * ωₐ_ᵢₙ
+        iₐᵢᵣ[i] = sol.u[i][2] * iₐ_ᵢₙ
+        iₛₒₗ[i] = sol.u[i][3] * iₛₒₗ_ᵢₙ
+    end
+    ωₐᵢᵣ,iₐᵢᵣ,iₛₒₗ
+end

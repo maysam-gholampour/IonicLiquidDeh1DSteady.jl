@@ -2,11 +2,6 @@ using IonicLiquidDeh1DSteady
 using CoolProp
 using Statistics
 
-
-
-
-
-
 begin 
     δ_fin_evap = 0.00013
     D_tube_outside_evap = 0.0101
@@ -19,7 +14,7 @@ begin
     Le = 0.86
     σ_evap = 1.0
     # ========================================
-    IL = CreCOPlus5100()
+    IL = LiCl()
     T_air_amb = 35 + 273.15 # K  #NOTE: 1.5 is the Blower temperature rise
     T_wb_air_amb = 27 + 273.15  # K
     m_dot_air_deh = 0.03584  # kg/s
@@ -28,13 +23,13 @@ begin
     Q_evap_ = m_dot_air_deh * (i_air_in - i_air_out_)
     V_air = m_dot_air_deh / (1.225 * (FS_evap + δ_fin_evap) * FD_evap) / N_fin_evap
     @show V_air
-    m_dot_sol_deh = 20.0 * 1100 * 2.57 / 60 / 1000  # kg/s  #FIXME: 1100 is density
-    T_sol_in_deh = 21 + 273.15  # K
-    X_sol_in_deh = 0.76
+    m_dot_sol_deh =1.0 * 1100 * 2.57 / 60 / 1000  # kg/s  #FIXME: 1100 is density
+    T_sol_in_deh = 25.0 + 273.15  # K
+    X_sol_in_deh = 0.3
     T_ref_in_evap = 12.19 + 273.15  # K
     T_ref_out_evap = 17.04 + 273.15  # K
     # Q_evap = 1192.0 * 1.62251
-    Q_evap = 1192.0 * 0.001
+    Q_evap = 1192.0 * 1.37
     @show Q_evap_ - Q_evap
     P_evap = 4.3e5
     T_sat_evap = 10.51 + 273.15
@@ -129,20 +124,28 @@ begin
             FD, δₛₒₗ, H_adjuasted, N_tube, N_row, 𝑘ₐ, cpₐ, Le, ṁₐ,δ_fin)
     @show NTUᴰₐᵢᵣ
     # ========================================
-    solve_coil_ode!(IL ,H_adjuasted ,Le ,∂Qᵣ ,ṁₐᵢᵣ_ᵢₙ ,NTUᴰₐᵢᵣ ,σ ,ṁₛₒₗ_ᵢₙ ,ξₛₒₗ_ᵢₙ ,iₛₒₗ_ᵢₙ , ωₐ_ᵢₙ, iₐ_ᵢₙ,
-                    dt,tspan,ωₐᵢᵣ,iₐᵢᵣ,ṁₛₒₗ,ξₛₒₗ,iₛₒₗ)
+    
+    ωₐᵢᵣ,iₐᵢᵣ,iₛₒₗ = solve_coil_naive_ode(IL ,H_adjuasted ,Le ,∂Qᵣ ,ṁₐᵢᵣ_ᵢₙ ,NTUᴰₐᵢᵣ ,σ ,ṁₛₒₗ_ᵢₙ ,ξₛₒₗ_ᵢₙ ,iₛₒₗ_ᵢₙ , ωₐ_ᵢₙ, iₐ_ᵢₙ,
+                    dt,tspan)
+
+    # solve_coil_ode!(IL ,H_adjuasted ,Le ,∂Qᵣ ,ṁₐᵢᵣ_ᵢₙ ,NTUᴰₐᵢᵣ ,σ ,ṁₛₒₗ_ᵢₙ ,ξₛₒₗ_ᵢₙ ,iₛₒₗ_ᵢₙ , ωₐ_ᵢₙ, iₐ_ᵢₙ,
+    #             dt,tspan,ωₐᵢᵣ,iₐᵢᵣ,ṁₛₒₗ,ξₛₒₗ,iₛₒₗ)
 
     Tdp = HAPropsSI("Tdp", "W", ωₐᵢᵣ[1] , "H", iₐᵢᵣ[1], "P", 101325.0) - 273.15
     Ta = HAPropsSI("T", "W", ωₐᵢᵣ[1] , "H", iₐᵢᵣ[1], "P", 101325.0) - 273.15
     @show Tdp, Ta
 
     T_sol_calc = (i,ξ) -> calculate_T_sol(i, ξ,IL) - 273.15
-    T_sol = @. T_sol_calc(iₛₒₗ, ξₛₒₗ)
+    # T_sol = @. T_sol_calc(iₛₒₗ, ξₛₒₗ)
+    T_sol = @. T_sol_calc(iₛₒₗ, ξₛₒₗ_ᵢₙ)
     @show minimum(T_sol)
     @show mean(T_sol)
 end
 
-
+@profview solve_coil_naive_ode(IL ,H_adjuasted ,Le ,∂Qᵣ ,ṁₐᵢᵣ_ᵢₙ ,NTUᴰₐᵢᵣ ,σ ,ṁₛₒₗ_ᵢₙ ,ξₛₒₗ_ᵢₙ ,iₛₒₗ_ᵢₙ , ωₐ_ᵢₙ, iₐ_ᵢₙ,
+                    dt,tspan)
+@profview solve_coil_naive_ode(IL ,H_adjuasted ,Le ,∂Qᵣ ,ṁₐᵢᵣ_ᵢₙ ,NTUᴰₐᵢᵣ ,σ ,ṁₛₒₗ_ᵢₙ ,ξₛₒₗ_ᵢₙ ,iₛₒₗ_ᵢₙ , ωₐ_ᵢₙ, iₐ_ᵢₙ,
+                dt,tspan)
 
 # using InteractiveUtils:@code_warntype
 
