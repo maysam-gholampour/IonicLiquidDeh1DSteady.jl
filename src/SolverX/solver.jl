@@ -83,15 +83,15 @@ function solve_coil_ode(IL ,H ,Le ,∂Qᵣ ,ṁₐᵢᵣ_ᵢₙ ,NTUᴰₐᵢᵣ
     p = @SVector[IL, H, Le, ∂Qᵣ, ṁₐᵢᵣ_ᵢₙ, NTUᴰₐᵢᵣ, σ, ṁₛₒₗ_ᵢₙ, ξₛₒₗ_ᵢₙ, iₛₒₗ_ᵢₙ, ωₐ_ᵢₙ, iₐ_ᵢₙ]
     u0 = [0.5, 0.5 , 1.0001 , 0.9 , 1.01]
 
-    bvp_fun = BVPFunction(
-    ionic_liquid_coil_ode!, (bca!, bcb!);
-    bcresid_prototype = (zeros(3), zeros(2)), twopoint = Val(true)
-    )
+    bvp_fun = TwoPointBVPFunction(
+                    ionic_liquid_coil_ode!, (bca!, bcb!);
+                    bcresid_prototype = (zeros(3), zeros(2)),
+        )
 
     prob = TwoPointBVProblem(bvp_fun,
-    u0,
-    tspan,
-    p)
+                u0,
+                tspan,
+                p, nlls = Val(false))
 
     sol = solve(prob, MIRK4(), dt = dt)
     # sol = solve(prob, Shooting(Tsit5()))
