@@ -33,11 +33,6 @@ begin
     t = tspan[1]:dt:tspan[2]
     len_vec = length(tspan[1]:dt:tspan[2])
     # ========================================
-    ωₐᵢᵣ = zeros(len_vec);
-    iₐᵢᵣ = zeros(len_vec);
-    ṁₛₒₗ = zeros(len_vec);
-    ξₛₒₗ = zeros(len_vec);
-    iₛₒₗ = zeros(len_vec);
 end
 
-simulate!(plateFinCircularTube,fluidThermalData, dt,tspan,ωₐᵢᵣ,iₐᵢᵣ,ṁₛₒₗ,ξₛₒₗ,iₛₒₗ)
+simulate!(plateFinCircularTube,fluidThermalData, dt,tspan)
