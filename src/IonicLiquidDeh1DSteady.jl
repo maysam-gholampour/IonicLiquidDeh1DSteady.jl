@@ -5,10 +5,6 @@ module IonicLiquidDeh1DSteady
     using Interpolations
     using NonlinearSolve
     using BoundaryValueDiffEq
-    using SciMLBase
-    using SciMLBase:TwoPointBVPFunction
-    using ODEInterface
-    # using Symbolics, LinearAlgebra, SparseArrays
 
     include("TypesInterface/types_interface.jl")
     include("FluidProperties/Props.jl")

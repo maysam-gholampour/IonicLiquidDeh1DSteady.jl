@@ -98,6 +98,7 @@ function _iₛₒₗ(T, ξ,::CaCl2)
     T_c_H2O = 647.226
     θ = T / T_c_H2O
     Δh_d0 = H₅ + H₆ * θ
+    ξ = maximum([ξ, 0.799])
     ξ_ = ξ / (H₄ - ξ)
     Δh_d = Δh_d0 * (1 + (ξ_ / H₁) ^ H₂) ^ H₃
     return Δh_d * 1e3
