@@ -33,6 +33,7 @@ function _Pᵥₐₚₒᵣ_ₛₒₗ(T, ξ,::LiCl)
     π₂₅ = 1.0 - (1.0 + (ξ / π₆)^π₇)^π₈ - π₉ * exp(- (ξ - 0.1)^2 / 0.005)
     θ = T / T_c_H2O
     P = f_Pᵥₐₚₒᵣ_ₛₒₗ(ξ,θ,LiCl()) * P_H2O(T) * π₂₅
+    P
 end
 
 function _ρₛₒₗ(T, ξ,::LiCl)
@@ -97,6 +98,7 @@ function _iₛₒₗ(T, ξ,::LiCl)
     T_c_H2O = 647.226
     θ = T / T_c_H2O
     Δh_d0 = H₅ + H₆ * θ
+    ξ = maximum([ξ, 0.599])
     ξ_ = ξ / (H₄ - ξ)
     Δh_d = Δh_d0 * (1 + (ξ_ / H₁) ^ H₂) ^ H₃
     return Δh_d * 1e3
@@ -119,7 +121,7 @@ function _σₛₒₗ(T, ξ,::LiCl)
     σₛₒₗ
 end
 
-function calculate_T_sol(iᵛₛₒₗ, ξ,::LiCl ;T_lower=0.0 + 273.15, T_upper=95.0 + 273.15) 
+function calculate_T_sol(iᵛₛₒₗ, ξ,::LiCl ;T_lower=-20.0 + 273.15, T_upper=95.0 + 273.15) 
     f(T, p)= _iₛₒₗ(T, p[2],LiCl()) - p[1]
     p = @SVector[iᵛₛₒₗ,ξ]
     T_span = @SVector[T_lower , T_upper]

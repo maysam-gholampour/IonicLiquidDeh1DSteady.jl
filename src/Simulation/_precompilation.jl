@@ -28,7 +28,7 @@ begin
     fluidThermalData = FluidThermalData(T_air_amb, T_wb_air_amb, m_dot_air_deh, m_dot_sol_deh, T_sol_in_deh, X_sol_in_deh, T_ref_in_evap,
     T_ref_out_evap, IL, Q_evap, P_evap, T_sat_evap,Le)
     # ========================================
-    dt = 0.001
+    dt = 0.0001
     tspan = (0.0, 1.0)
     t = tspan[1]:dt:tspan[2]
     len_vec = length(tspan[1]:dt:tspan[2])

@@ -47,11 +47,17 @@ function bcb!(res_b, u_b, p)
     nothing
 end
 
-function solve_coil_ode(Le ,∂Qᵣ ,ṁₐᵢᵣ_ᵢₙ ,NTUᴰₐᵢᵣ ,σ ,ṁₛₒₗ_ᵢₙ ,ξₛₒₗ_ᵢₙ ,iₛₒₗ_ᵢₙ , ωₐ_ᵢₙ, iₐ_ᵢₙ,
+function solve_coil_ode(IL, Le ,∂Qᵣ ,ṁₐᵢᵣ_ᵢₙ ,NTUᴰₐᵢᵣ ,σ ,ṁₛₒₗ_ᵢₙ ,ξₛₒₗ_ᵢₙ ,iₛₒₗ_ᵢₙ , ωₐ_ᵢₙ, iₐ_ᵢₙ,
                 dt,tspan)
-    # IL = IL
+    IonicLiquidDeh1DSteady.IL = IL
     p = @SVector[Le, ∂Qᵣ, ṁₐᵢᵣ_ᵢₙ, NTUᴰₐᵢᵣ, σ, ṁₛₒₗ_ᵢₙ, ξₛₒₗ_ᵢₙ, iₛₒₗ_ᵢₙ, ωₐ_ᵢₙ, iₐ_ᵢₙ]
     u0 = [0.1, 0.1 , 1.0001 , 0.9 , 1.01]
+
+    # if IL isa CreCOPlus5100
+    #     nlls =Val(true)
+    # else
+    #     nlls = Val(false)
+    # end
 
     bvp_fun = TwoPointBVPFunction(
                     ionic_liquid_coil_ode!, (bca!, bcb!);

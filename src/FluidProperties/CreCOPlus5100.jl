@@ -68,7 +68,7 @@ begin "Properties Interpolations and Extrapolations"
     end
     # ================== Find T given i_sol and ξ ====================
     # Function to find the root, given i_sol and ξ
-    function calculate_T_sol(iᵛₛₒₗ, ξ,::CreCOPlus5100 ;T_lower=0.0 + 273.15, T_upper=95.0 + 273.15) 
+    function calculate_T_sol(iᵛₛₒₗ, ξ,::CreCOPlus5100 ;T_lower=-20.0 + 273.15, T_upper=95.0 + 273.15) 
         f(T, p)= _iₛₒₗ(T, p[2],CreCOPlus5100()) - p[1]
         p = @SVector[iᵛₛₒₗ,ξ]
         T_span = @SVector[T_lower , T_upper]
