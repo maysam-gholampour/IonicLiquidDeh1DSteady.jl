@@ -29,11 +29,11 @@ struct FluidThermalData{T1<:AbstractFloat,T2<:IonicLiquid}<:InputData
     m_dot_sol::T1
     T_sol_in::T1
     X_sol_in::T1
-    T_ref_in::T1
-    T_ref_out::T1
+    T_ref_in::T1  #DELME: delete them
+    T_ref_out::T1  #DELME: delete them
     IL::T2
     Q::T1
-    P_sat::T1
-    T_sat::T1
+    P_sat::T1  #DELME: delete them
+    T_sat::T1  #DELME: delete them
     Le::T1
 end
