@@ -65,22 +65,25 @@ function solve_coil_ode(IL, Le ,∂Qᵣ ,ṁₐᵢᵣ_ᵢₙ ,NTUᴰₐᵢᵣ ,�
     sol = solve(prob, MIRK6(), dt = dt)
 
     len_vec = _len_sol(sol.u)
+    
     ωₐᵢᵣ = Vector{Float64}(undef,len_vec)
     iₐᵢᵣ = Vector{Float64}(undef,len_vec)
     ṁₛₒₗ = Vector{Float64}(undef,len_vec)
     ξₛₒₗ = Vector{Float64}(undef,len_vec)
     iₛₒₗ = Vector{Float64}(undef,len_vec)
-    _assign_data!(sol.u,ωₐᵢᵣ,iₐᵢᵣ,ṁₛₒₗ,ξₛₒₗ,iₛₒₗ,len_vec,ṁₛₒₗ_ᵢₙ ,ξₛₒₗ_ᵢₙ ,iₛₒₗ_ᵢₙ , ωₐ_ᵢₙ, iₐ_ᵢₙ)
+    t = Vector{Float64}(undef,len_vec)
+    _assign_data!(sol.u,sol.t,t,ωₐᵢᵣ,iₐᵢᵣ,ṁₛₒₗ,ξₛₒₗ,iₛₒₗ,len_vec,ṁₛₒₗ_ᵢₙ ,ξₛₒₗ_ᵢₙ ,iₛₒₗ_ᵢₙ , ωₐ_ᵢₙ, iₐ_ᵢₙ)
 
-    ωₐᵢᵣ,iₐᵢᵣ,ṁₛₒₗ,ξₛₒₗ,iₛₒₗ
+    t,ωₐᵢᵣ,iₐᵢᵣ,ṁₛₒₗ,ξₛₒₗ,iₛₒₗ
 end
 
 _len_sol(x::Vector) = length(x)
 
-function _assign_data!(data::Vector{Vector{T}},ωₐᵢᵣ::Vector{T}, iₐᵢᵣ::Vector{T},
+function _assign_data!(data::Vector{Vector{T}},t_::Vector{T},t::Vector{T},ωₐᵢᵣ::Vector{T}, iₐᵢᵣ::Vector{T},
      ṁₛₒₗ::Vector{T}, ξₛₒₗ::Vector{T}, iₛₒₗ::Vector{T},len_vec,ṁₛₒₗ_ᵢₙ ,ξₛₒₗ_ᵢₙ ,iₛₒₗ_ᵢₙ , ωₐ_ᵢₙ, iₐ_ᵢₙ) where T<:AbstractFloat
     @inbounds for i in 1:len_vec
         # ωₐᵢᵣ, iₐᵢᵣ, ṁₛₒₗ,ξₛₒₗ, iₛₒₗ = u
+        t[i] = t_[i]
         ωₐᵢᵣ[i] = data[i][1] * ωₐ_ᵢₙ
         iₐᵢᵣ[i] = data[i][2] * iₐ_ᵢₙ
         ṁₛₒₗ[i] = data[i][3] * ṁₛₒₗ_ᵢₙ
@@ -89,6 +92,7 @@ function _assign_data!(data::Vector{Vector{T}},ωₐᵢᵣ::Vector{T}, iₐᵢ�
     end
     nothing
 end
+
 
 # ========================================
 #= function solve_coil_ode!(IL ,H ,Le ,∂Qᵣ ,ṁₐᵢᵣ_ᵢₙ ,NTUᴰₐᵢᵣ ,σ ,ṁₛₒₗ_ᵢₙ ,ξₛₒₗ_ᵢₙ ,iₛₒₗ_ᵢₙ , ωₐ_ᵢₙ, iₐ_ᵢₙ,
