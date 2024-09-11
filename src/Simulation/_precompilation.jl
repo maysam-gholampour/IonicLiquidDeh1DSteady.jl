@@ -35,4 +35,4 @@ begin
     # ========================================
 end
 
-simulate!(plateFinCircularTube,fluidThermalData, dt,tspan)
+simulate(plateFinCircularTube,fluidThermalData, dt,tspan)

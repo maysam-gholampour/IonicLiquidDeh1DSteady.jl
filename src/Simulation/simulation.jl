@@ -1,6 +1,6 @@
-export simulate!
+export simulate
 
-function simulate!(plateFinCircularTube::PlateFinCircularTube,fluidThermalData::FluidThermalData, 
+function simulate(plateFinCircularTube::PlateFinCircularTube,fluidThermalData::FluidThermalData, 
     dt,tspan)
     g = 9.81
     m_dot_air = fluidThermalData.m_dot_air
