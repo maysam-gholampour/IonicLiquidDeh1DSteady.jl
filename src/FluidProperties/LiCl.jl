@@ -101,6 +101,7 @@ function _iₛₒₗ(T, ξ,::LiCl)
     if ξ > 0.599
         ξ = 0.599
     end
+    ξ = maximum(0.0,ξ)
     ξ_ = ξ / (H₄ - ξ)
     Δh_d = Δh_d0 * (1 + (ξ_ / H₁) ^ H₂) ^ H₃
     return Δh_d * 1e3

@@ -23,17 +23,13 @@ end
 # ==================== InputData ====================
 abstract type InputData end
 struct FluidThermalData{T1<:AbstractFloat,T2<:IonicLiquid}<:InputData
-    T_air::T1
+    Tₐ_ᵢₙ::T1
     T_wb_air::T1
     m_dot_air::T1
     m_dot_sol::T1
-    T_sol_in::T1
-    X_sol_in::T1
-    T_ref_in::T1  #DELME: delete them
-    T_ref_out::T1  #DELME: delete them
+    Tₛₒₗ_ᵢₙ::T1
+    ξₛₒₗ_ᵢₙ::T1
     IL::T2
     Q::T1
-    P_sat::T1  #DELME: delete them
-    T_sat::T1  #DELME: delete them
     Le::T1
 end

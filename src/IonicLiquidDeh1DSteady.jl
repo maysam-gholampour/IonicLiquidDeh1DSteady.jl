@@ -5,6 +5,7 @@ module IonicLiquidDeh1DSteady
     using Interpolations
     using NonlinearSolve
     using BoundaryValueDiffEq
+    using UnPack: @unpack
 
     include("TypesInterface/types_interface.jl")
     include("FluidProperties/Props.jl")
