@@ -2,8 +2,8 @@ module IonicLiquidDeh1DSteady
     __precompile__(true)
     using Reexport: @reexport
     
-    @reexport using PrecompileTools: @setup_workload, @compile_workload  
-    @reexport using StaticArrays
+    using PrecompileTools: @setup_workload, @compile_workload  
+    using StaticArrays
     @reexport using CoolProp
     @reexport using NonlinearSolve
     @reexport using UnPack: @unpack
