@@ -1,11 +1,14 @@
 module IonicLiquidDeh1DSteady
-    using PrecompileTools: @setup_workload, @compile_workload  
-    using StaticArrays
-    using CoolProp
+    __precompile__(true)
+    using Reexport: @reexport
+    
+    @reexport using PrecompileTools: @setup_workload, @compile_workload  
+    @reexport using StaticArrays
+    @reexport using CoolProp
+    @reexport using NonlinearSolve
+    @reexport using UnPack: @unpack
     using Interpolations
-    using NonlinearSolve
     using BoundaryValueDiffEq
-    using UnPack: @unpack
 
     include("TypesInterface/types_interface.jl")
     include("FluidProperties/Props.jl")
@@ -17,7 +20,6 @@ module IonicLiquidDeh1DSteady
             include("Simulation/_precompilation.jl")
         end
     end
-
 
 end
 
