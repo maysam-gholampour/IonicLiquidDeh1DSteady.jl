@@ -1,4 +1,5 @@
 export solve_coil_ode
+export ionic_liquid_coil_ode!, bca!, bcb!
 # export solve_coil_naive_ode
 
 include("NTU.jl")
