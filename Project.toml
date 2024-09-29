@@ -1,7 +1,7 @@
 name = "IonicLiquidDeh1DSteady"
 uuid = "5940f117-b31a-4bc9-9d4c-2822927a2039"
 authors = ["maysam-gholampour <meysam.gholampoor@gmail.com> and contributors"]
-version = "1.0.0-DEV"
+version = "1.1.0-DEV"
 
 [deps]
 BoundaryValueDiffEq = "764a87c0-6b3e-53db-9096-fe964310641d"
