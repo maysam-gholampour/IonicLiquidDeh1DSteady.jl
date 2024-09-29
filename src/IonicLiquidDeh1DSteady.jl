@@ -1,5 +1,5 @@
 module IonicLiquidDeh1DSteady
-    __precompile__(false)
+    __precompile__(true)
     using Reexport: @reexport
     
     using PrecompileTools: @setup_workload, @compile_workload  
