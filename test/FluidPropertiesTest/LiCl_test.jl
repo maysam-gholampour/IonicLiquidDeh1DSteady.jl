@@ -38,8 +38,9 @@ using Test
 
     # Fig. 21. Calculated and measured values of the differential enthalpy of
     # dilution for aqueous solutions of lithium chloride.
-    @test _iₛₒₗ(T, ξ, LiCl()) ≈ 116705.086 atol=1e-3
+    @test _Δh(T, ξ, LiCl()) ≈ 116705.086 atol=1e-3
 
-
-    @test calculate_T_sol(116705.086, ξ, LiCl()) ≈ 50.0 + 273.15 atol=1e-3
+    i = _iₛₒₗ(T, ξ, LiCl())
+    @test calculate_T_sol(i, ξ, LiCl()) ≈ 50.0 + 273.15 atol=1e-3
 end
+
