@@ -12,7 +12,7 @@
     Keywords: Liquid desiccants; Properties; Air conditioning; Open absorption; Lithium chloride; Calcium chloride; Calculation models
 """
 
-function f_Pᵥₐₚₒᵣ_ₛₒₗ(ξ,θ,::LiCl)
+@inline function f_Pᵥₐₚₒᵣ_ₛₒₗ(ξ,θ,::LiCl)
     ξ = 0.0001 * (ξ < 0.0) + ξ * (ξ ≥ 0.0)
     π₀ = 0.28
     π₁ = 4.30
@@ -25,7 +25,7 @@ function f_Pᵥₐₚₒᵣ_ₛₒₗ(ξ,θ,::LiCl)
     return A + B * θ
 end
 
-function _Pᵥₐₚₒᵣ_ₛₒₗ(T, ξ,::LiCl)
+@inline function _Pᵥₐₚₒᵣ_ₛₒₗ(T, ξ,::LiCl)
     ξ = 0.0001 * (ξ < 0.0) + ξ * (ξ ≥ 0.0)
     π₆ = 0.362
     π₇ = -4.75
@@ -94,7 +94,7 @@ function _𝑘ₛₒₗ(T, ξ,::LiCl)
     λₛₒₗ
 end 
 
-function _iₛₒₗ(T, ξ,::LiCl)
+@inline function _Δh(T, ξ,::LiCl)
     ξ = 0.0001 * (ξ < 0.0) + ξ * (ξ ≥ 0.0)
     H₁ = 0.845 
     H₂ = -1.965 
@@ -109,6 +109,13 @@ function _iₛₒₗ(T, ξ,::LiCl)
     ξ_ = ξ / (H₄ - ξ)
     Δh_d = Δh_d0 * (1 + (ξ_ / H₁) ^ H₂) ^ H₃
     return Δh_d * 1e3
+end
+
+
+@inline function _iₛₒₗ(T, ξ,::LiCl)
+    Δh = _Δh(T, ξ,LiCl())
+    i = _cpₛₒₗ(T, ξ,LiCl()) * (T - 273.15) - Δh
+    return i
 end
 
 function _σₛₒₗ(T, ξ,::LiCl)
@@ -129,14 +136,15 @@ function _σₛₒₗ(T, ξ,::LiCl)
     σₛₒₗ
 end
 
-function calculate_T_sol(iᵛₛₒₗ, ξ,::LiCl ;T_lower=-20.0 + 273.15, T_upper=95.0 + 273.15) 
+@inline function calculate_T_sol(iᵛₛₒₗ, ξ,::LiCl ;T_lower=228.0, T_upper=120.0 + 273.15) 
     ξ = 0.0001 * (ξ < 0.0) + ξ * (ξ ≥ 0.0)
+    ξ = 0.599 * (ξ > 0.599) + ξ * (ξ ≤ 0.599)
     f(T, p)= _iₛₒₗ(T, p[2],LiCl()) - p[1]
     p = @SVector[iᵛₛₒₗ,ξ]
     T_span = @SVector[T_lower , T_upper]
-    prob = IntervalNonlinearProblem(f, T_span, p)
+    prob = IntervalNonlinearProblem{false}(f, T_span, p)
     result = solve(prob, ITP())
-    return calculate_T_barrier(result)
+    return result.u
 end
 
 

@@ -12,6 +12,8 @@
     Keywords: Liquid desiccants; Properties; Air conditioning; Open absorption; Lithium chloride; Calcium chloride; Calculation models
 =#
 
+
+
 @testset "CaCl2 Properties" begin
     T = 50.0 + 273.15
     ξ = 0.3
@@ -35,9 +37,11 @@
 
     # Fig. 22. Calculated and measured values of the differential enthalpy of
     # dilution for aqueous solutions of calcium chloride.
-    @test _iₛₒₗ(T, ξ, CaCl2()) ≈ 45329.025 atol=1e-3
+    @test _Δh(T, ξ, CaCl2()) ≈ 45329.025 atol=1e-3
 
-
-    @test calculate_T_sol(45329.025, ξ, CaCl2()) ≈ 50.0 + 273.15 atol=0.1
+    i = _iₛₒₗ(T, ξ, CaCl2())
+    @test calculate_T_sol(i, ξ, CaCl2()) ≈ 50.0 + 273.15 atol=0.1
 end
+
+
 

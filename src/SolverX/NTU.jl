@@ -12,7 +12,7 @@ function NTU(ρ::T1, uₘₐₓ::T1, D_tube::T1, μ::T1, Pr::T1, fin_spacing::T1
    f = 1.039 * Re_D^(-0.418) * ((δ_fin + δₛₒₗ) / D_tube)^(-0.104) * N_row^(-0.0935) * (Fₚ / D_tube)^(-0.197)  
    Nu = j * Re_D * Pr^(1.0/3.0)
    hₒ = Nu * k / D_tube
-   hᴰₐᵢᵣ = hₒ / cp * Le^(2.0/3.0)
+   hᴰₐᵢᵣ = hₒ / (cp * Le^(2.0/3.0))
    NTUᴰₐᵢᵣ = hᴰₐᵢᵣ * fin_depth * H / ṁₐ
    NTUᴰₐᵢᵣ
    #= 

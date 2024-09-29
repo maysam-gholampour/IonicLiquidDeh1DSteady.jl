@@ -1,5 +1,5 @@
 module IonicLiquidDeh1DSteady
-    __precompile__(true)
+    __precompile__(false)
     using Reexport: @reexport
     
     using PrecompileTools: @setup_workload, @compile_workload  
@@ -9,6 +9,7 @@ module IonicLiquidDeh1DSteady
     @reexport using UnPack: @unpack
     using Interpolations
     using BoundaryValueDiffEq
+    using BoundaryValueDiffEq:AbstractFIRK, AbstractMIRK
 
     include("TypesInterface/types_interface.jl")
     include("FluidProperties/Props.jl")

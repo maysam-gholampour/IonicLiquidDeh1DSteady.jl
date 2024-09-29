@@ -4,7 +4,7 @@ export ionic_liquid_coil_ode!, bca!, bcb!
 
 include("NTU.jl")
 
-function ionic_liquid_coil_ode!(du,u, p, t)
+@inline function ionic_liquid_coil_ode!(du,u, p, t)
     # ωₐᵢᵣ, iₐᵢᵣ, ṁₛₒₗ,ξₛₒₗ, iₛₒₗ = u
     # ========================================
     Le = p[1]
@@ -48,8 +48,8 @@ function bcb!(res_b, u_b, p)
     nothing
 end
 
-function solve_coil_ode(IL, Le ,∂Qᵣ ,ṁₐᵢᵣ_ᵢₙ ,NTUᴰₐᵢᵣ ,σ ,ṁₛₒₗ_ᵢₙ ,ξₛₒₗ_ᵢₙ ,iₛₒₗ_ᵢₙ , ωₐ_ᵢₙ, iₐ_ᵢₙ,
-                dt,tspan)
+@inline function solve_coil_ode(IL, Le ,∂Qᵣ ,ṁₐᵢᵣ_ᵢₙ ,NTUᴰₐᵢᵣ ,σ ,ṁₛₒₗ_ᵢₙ ,ξₛₒₗ_ᵢₙ ,iₛₒₗ_ᵢₙ , ωₐ_ᵢₙ, iₐ_ᵢₙ,
+                dt,tspan,solver::T) where {T<:Union{AbstractFIRK,AbstractMIRK}}
     IonicLiquidDeh1DSteady.IL = IL
     p = @SVector[Le, ∂Qᵣ, ṁₐᵢᵣ_ᵢₙ, NTUᴰₐᵢᵣ, σ, ṁₛₒₗ_ᵢₙ, ξₛₒₗ_ᵢₙ, iₛₒₗ_ᵢₙ, ωₐ_ᵢₙ, iₐ_ᵢₙ]
     u0 = [0.1, 0.1 , 1.0001 , 0.9 , 1.01]
@@ -63,7 +63,13 @@ function solve_coil_ode(IL, Le ,∂Qᵣ ,ṁₐᵢᵣ_ᵢₙ ,NTUᴰₐᵢᵣ ,�
                 u0,
                 tspan,
                 p)
-    sol = solve(prob, MIRK6(), dt = dt)
+    
+    # @info " solver = $solver"
+    sol = solve(prob, solver, dt = dt)
+    # @info "nlsolve = $(sol.alg.nlsolve)"
+    # @info "sol1.alg = $(sol.alg)"
+    
+    @info "Solving the coil ODE is completed and sol.retcode = $(sol.retcode)"
 
     len_vec = _len_sol(sol.u)
     
@@ -80,7 +86,7 @@ end
 
 _len_sol(x::Vector) = length(x)
 
-function _assign_data!(data::Vector{Vector{T}},t_::Vector{T},t::Vector{T},ωₐᵢᵣ::Vector{T}, iₐᵢᵣ::Vector{T},
+@inline function _assign_data!(data::Vector{Vector{T}},t_::Vector{T},t::Vector{T},ωₐᵢᵣ::Vector{T}, iₐᵢᵣ::Vector{T},
      ṁₛₒₗ::Vector{T}, ξₛₒₗ::Vector{T}, iₛₒₗ::Vector{T},len_vec,ṁₛₒₗ_ᵢₙ ,ξₛₒₗ_ᵢₙ ,iₛₒₗ_ᵢₙ , ωₐ_ᵢₙ, iₐ_ᵢₙ) where T<:AbstractFloat
     @inbounds for i in 1:len_vec
         # ωₐᵢᵣ, iₐᵢᵣ, ṁₛₒₗ,ξₛₒₗ, iₛₒₗ = u

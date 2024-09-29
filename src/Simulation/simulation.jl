@@ -1,7 +1,7 @@
 export simulate
 
 function simulate(plateFinCircularTube::PlateFinCircularTube,fluidThermalData::FluidThermalData, 
-    dt,tspan)
+    dt,tspan;solver = RadauIIa7(nested_nlsolve = true,nest_tol = 1e-3))
     g = 9.81
     @unpack δ_fin,D_tube_outside,N_tube_per_row,N_row,N_fin,FD,H,FS,σ = plateFinCircularTube
     @unpack Tₐ_ᵢₙ,T_wb_air,m_dot_air,m_dot_sol,Tₛₒₗ_ᵢₙ,ξₛₒₗ_ᵢₙ,IL,Q,Le = fluidThermalData
@@ -47,6 +47,6 @@ function simulate(plateFinCircularTube::PlateFinCircularTube,fluidThermalData::F
             FD, δₛₒₗ, H_adjuasted, N_tube, N_row, 𝑘ₐ, cpₐ, Le, ṁₐ,δ_fin)
     # ========================================
     t,ωₐᵢᵣ,iₐᵢᵣ,ṁₛₒₗ,ξₛₒₗ,iₛₒₗ = solve_coil_ode(IL,Le ,∂Qᵣ ,ṁₐᵢᵣ_ᵢₙ ,NTUᴰₐᵢᵣ ,σ ,ṁₛₒₗ_ᵢₙ ,ξₛₒₗ_ᵢₙ ,iₛₒₗ_ᵢₙ , ωₐ_ᵢₙ, iₐ_ᵢₙ,
-                    dt,tspan)
+                    dt,tspan,solver)
     t,ωₐᵢᵣ,iₐᵢᵣ,ṁₛₒₗ,ξₛₒₗ,iₛₒₗ
 end
