@@ -37,7 +37,7 @@ begin "Properties Interpolations and Extrapolations"
     @inline function _Pᵥₐₚₒᵣ_ₛₒₗ(T, ξ,::CreCOPlus5100)
         A = a0_p + a1_p * ξ + a2_p * ξ^2 + a3_p * ξ^3
         B = b0_p + b1_p * ξ + b2_p * ξ^2 + b3_p * ξ^3
-        return 10^(A - B / T) * 100.0 * 1.03
+        return 10^(A - B / T) * 100.0 * 1.0
     end
     # ================== Interpolation and Extrapolation ρ ====================
     function _ρₛₒₗ(T, ξ,::CreCOPlus5100)
